@@ -1,0 +1,21 @@
+eve:
+  client:
+    clientId: bbe0e9c6af914c2d99a11bd30d1d3a18
+    clientSecret: SM33Gc14MM6kf5a7bAnmt5Se23m8t0slKgwsx7nL
+    accessTokenUri: https://login.eveonline.com/oauth/token
+    userAuthorizationUri: https://login.eveonline.com/oauth/authorize
+    tokenName: oauth_token
+    authenticationScheme: query
+    clientAuthenticationScheme: form
+  resource:
+    userInfoUri: https://login.eveonline.com/oauth/verify
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+spring:
+  resources:
+    chain:
+      enabled: true
+      
