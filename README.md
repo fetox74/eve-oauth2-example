@@ -13,7 +13,7 @@ _mvn package_
 
 ### Run with:
 
-_java -jar eve-oauth2-example-0.0.1.jar_
+_java -jar eve-oauth2-example-0.0.2.jar_
 
 ### Point your browser to:
 

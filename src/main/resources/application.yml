@@ -4,6 +4,7 @@ eve:
     clientSecret: SM33Gc14MM6kf5a7bAnmt5Se23m8t0slKgwsx7nL
     accessTokenUri: https://login.eveonline.com/oauth/token
     userAuthorizationUri: https://login.eveonline.com/oauth/authorize
+    scope: publicData, characterContactsRead
     tokenName: oauth_token
     authenticationScheme: query
     clientAuthenticationScheme: form
@@ -18,4 +19,3 @@ spring:
   resources:
     chain:
       enabled: true
-      

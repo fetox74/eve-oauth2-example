@@ -1,7 +1,8 @@
 package com.example;
 
 import java.io.IOException;
-import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -10,6 +11,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -27,6 +31,7 @@ import org.springframework.security.oauth2.client.filter.OAuth2ClientContextFilt
 import org.springframework.security.oauth2.client.resource.OAuth2ProtectedResourceDetails;
 import org.springframework.security.oauth2.client.token.grant.code.AuthorizationCodeResourceDetails;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableOAuth2Client;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfFilter;
@@ -47,10 +52,29 @@ public class EveOAuth2Example
   @Autowired
   private OAuth2ClientContext oauth2ClientContext;
 
+  private Integer characterId;
+
   @RequestMapping("/user")
-  public Principal user(Principal principal)
+  public Map<String, Object> user(OAuth2Authentication authentication)
   {
-    return principal;
+    Map<String, Object> details = (Map<String, Object>)authentication.getUserAuthentication().getDetails();
+    characterId = (Integer)details.get("CharacterID");
+    return details;
+  }
+
+  @RequestMapping("/test")
+  public Map<String, Object> test()
+    throws IOException
+  {
+    final String uri = "https://crest-tq.eveonline.com/characters/" + characterId + "/contacts/";
+    JsonFactory factory = new JsonFactory();
+    ObjectMapper mapper = new ObjectMapper(factory);
+
+    OAuth2RestTemplate restTemplate = new OAuth2RestTemplate(new AuthorizationCodeResourceDetails(), oauth2ClientContext);
+
+    Map<String,Object> result = mapper.readValue(restTemplate.getForObject(uri, String.class), new TypeReference<HashMap<String,Object>>(){});
+
+    return result;
   }
 
   @Override
@@ -76,7 +100,7 @@ public class EveOAuth2Example
   }
 
   @Bean
-  public FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter)
+  protected FilterRegistrationBean oauth2ClientFilterRegistration(OAuth2ClientContextFilter filter)
   {
     FilterRegistrationBean registration = new FilterRegistrationBean();
     registration.setFilter(filter);
@@ -95,14 +119,14 @@ public class EveOAuth2Example
 
   @Bean
   @ConfigurationProperties("eve.client")
-  OAuth2ProtectedResourceDetails eve()
+  protected OAuth2ProtectedResourceDetails eve()
   {
     return new AuthorizationCodeResourceDetails();
   }
 
   @Bean
   @ConfigurationProperties("eve.resource")
-  ResourceServerProperties eveResource()
+  protected ResourceServerProperties eveResource()
   {
     return new ResourceServerProperties();
   }

@@ -25,6 +25,12 @@
 	<div>
 		<button ng-click="home.logout()" class="btn btn-primary">Logout</button>
 	</div>
+  <div>
+		<br>
+    <button ng-click="home.test()" class="btn btn-primary">Test CREST</button>
+  </div>
+	<div id="result">
+	</div>
 </div>
 <script type="text/javascript" src="/webjars/angularjs/angular.min.js"></script>
 <script type="text/javascript">
@@ -36,21 +42,28 @@
 		}).controller("home", function($http, $location) {
 			var self = this;
 			$http.get("/user").success(function(data) {
-				self.user = data.userAuthentication.details.CharacterName;
+				self.user = data.CharacterName;
 				self.authenticated = true;
 			}).error(function() {
 				self.user = "N/A";
 				self.authenticated = false;
 			});
 			self.logout = function() {
-				$http.post('logout', {}).success(function() {
+				$http.post("logout", {}).success(function() {
 					self.authenticated = false;
 					$location.path("/");
 				}).error(function(data) {
-					console.log("Logout failed")
+					console.log("Logout failed");
 					self.authenticated = false;
 				});
 			};
+      self.test = function() {
+        $http.get("/test").success(function(data) {
+					$("#result").append(JSON.stringify(data.items));
+        }).error(function(data) {
+          console.log("Test failed");
+        });
+      };
 		});
 </script>
 </body>
